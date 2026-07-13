@@ -1,0 +1,5 @@
+.idea/
+*.log
+preview_gap.html
+serve.py
+serve.log

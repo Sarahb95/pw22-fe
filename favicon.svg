@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- ombra sfasata -->
+  <polygon points="7,4 31,4 28,31 4,31" fill="#1A1008"/>
+  <!-- quadrato inclinato senape -->
+  <polygon points="5,2 29,2 26,29 2,29" fill="#DA8413" stroke="#1A1008" stroke-width="1.5"/>
+  <!-- lettera E -->
+  <text x="15" y="23"
+        font-family="Oswald,Arial,sans-serif"
+        font-size="20" font-weight="700"
+        text-anchor="middle" fill="#1A1008">E</text>
+</svg>
