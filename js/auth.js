@@ -1,6 +1,4 @@
-// =====================================================================
 // Stato utente lato client — persistito in localStorage
-// =====================================================================
 const STORAGE_KEY = "eliseo.user";
 
 const Auth = {

@@ -1,5 +1,5 @@
 // =====================================================================
-// Wrapper REST verso il backend Spring Boot
+// Chiamate REST al backend
 // =====================================================================
 const API_BASE = "http://localhost:8080/api";
 

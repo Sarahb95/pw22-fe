@@ -1,7 +1,4 @@
-// =====================================================================
-// Bootstrap: registra le rotte, sincronizza la nav con lo stato auth,
-// gestisce il logout.
-// =====================================================================
+// Avvio app: rotte, nav, logout.
 
 function syncNavWithAuth() {
     const user = Auth.current();

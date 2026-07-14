@@ -54,7 +54,6 @@ function showCardHTML(s, featured = false) {
     `;
 }
 
-// ---------------------------------------------------------------------
 function frameHTML(s, idx) {
     const cat = s.categoria || "TEATRO";
     const label = CAT_LABEL[cat] || cat;
@@ -80,7 +79,6 @@ function frameHTML(s, idx) {
 
 
 // HOME
-// ---------------------------------------------------------------------
 async function renderHome() {
     SEO.set({
         description: "Nuovo Cinema Teatro Eliseo di Poggiomarino: la stagione 2026·27 tra teatro, danza, cinema e salotti culturali. Prenota il tuo posto."
@@ -184,9 +182,7 @@ async function renderHome() {
     }
 }
 
-// ---------------------------------------------------------------------
 // CATALOGO
-// ---------------------------------------------------------------------
 async function renderCatalogo(_, path) {
     const params = new URLSearchParams(path.split("?")[1] || "");
     const activeCat = params.get("cat");
@@ -231,9 +227,7 @@ async function renderCatalogo(_, path) {
     }
 }
 
-// ---------------------------------------------------------------------
 // DETTAGLIO SPETTACOLO
-// ---------------------------------------------------------------------
 async function renderDettaglio({ id }) {
     root().innerHTML = `<div class="loader">Caricamento…</div>`;
 
@@ -319,9 +313,7 @@ async function renderDettaglio({ id }) {
     }
 }
 
-// ---------------------------------------------------------------------
 // PIANTA POSTI (multi-select)
-// ---------------------------------------------------------------------
 async function renderSeats({ replicaId }) {
     if (!Auth.isLoggedIn()) {
         Router.go("/login?next=/prenota/" + replicaId);
@@ -466,9 +458,7 @@ async function renderSeats({ replicaId }) {
     }
 }
 
-// ---------------------------------------------------------------------
 // ABBONAMENTI
-// ---------------------------------------------------------------------
 const PIANI = [
     {
         tipo:     "STAGIONALE",
@@ -551,9 +541,7 @@ async function renderAbbonamenti() {
     });
 }
 
-// ---------------------------------------------------------------------
 // LOGIN
-// ---------------------------------------------------------------------
 function renderLogin(_, path) {
     SEO.set({ title: "Accedi", robots: "noindex, nofollow" });
     const params = new URLSearchParams(path.split("?")[1] || "");
@@ -571,8 +559,8 @@ function renderLogin(_, path) {
             <div id="login-feedback" aria-live="polite" aria-atomic="true"></div>
             <div class="switch">Non hai un account? <a href="#/registrazione">Registrati</a></div>
             <div class="demo-hint">
-                Demo: <code>admin@eliseo.it</code> / <code>admin123</code><br>
-                oppure <code>mario@example.it</code> / <code>mario123</code>
+                Demo: <code>marco@example.it</code> / <code>marco123</code><br>
+                oppure <code>giulia@example.it</code> / <code>giulia123</code>
             </div>
         </section>
     `;
@@ -592,9 +580,7 @@ function renderLogin(_, path) {
     });
 }
 
-// ---------------------------------------------------------------------
 // REGISTRAZIONE
-// ---------------------------------------------------------------------
 function renderRegister() {
     SEO.set({ title: "Crea un account", robots: "noindex, nofollow" });
     root().innerHTML = `
@@ -606,7 +592,7 @@ function renderRegister() {
                 <label>Cognome <input name="cognome" required></label>
                 <label>Email <input type="email" name="email" required autocomplete="email"></label>
                 <label>Password (min 6) <input type="password" name="password" required minlength="6" autocomplete="new-password"></label>
-                <label>Data di nascita <input type="date" name="dataNascita" required max="${new Date().toISOString().split('T')[0]}"></label>
+                <label>Data di nascita <input type="text" name="dataNascita" placeholder="gg/mm/aaaa" required></label>
                 <button type="submit" class="btn btn-gold">Registrati</button>
             </form>
             <div id="register-feedback" aria-live="polite" aria-atomic="true"></div>
@@ -614,12 +600,26 @@ function renderRegister() {
         </section>
     `;
 
+    document.querySelector('[name="dataNascita"]').addEventListener('input', function () {
+        const digits = this.value.replace(/\D/g, '').slice(0, 8);
+        let out = digits.slice(0, 2);
+        if (digits.length > 2) out += '/' + digits.slice(2, 4);
+        if (digits.length > 4) out += '/' + digits.slice(4);
+        this.value = out;
+    });
+
     document.getElementById("register-form").addEventListener("submit", async (e) => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(e.target));
         const feedback = document.getElementById("register-feedback");
         feedback.innerHTML = "";
         try {
+            const [gg, mm, aaaa] = data.dataNascita.split("/");
+            if (!gg || !mm || !aaaa || isNaN(new Date(`${aaaa}-${mm}-${gg}`))) {
+                feedback.innerHTML = `<div class="feedback error">Data non valida. Usa il formato gg/mm/aaaa.</div>`;
+                return;
+            }
+            data.dataNascita = `${aaaa}-${mm}-${gg}`;
             const user = await API.auth.register(data);
             Auth.setUser(user);
             feedback.innerHTML = `<div class="feedback ok">Account creato! Reindirizzamento…</div>`;
@@ -630,9 +630,7 @@ function renderRegister() {
     });
 }
 
-// ---------------------------------------------------------------------
 // PROFILO
-// ---------------------------------------------------------------------
 async function renderProfile() {
     if (!Auth.isLoggedIn()) { Router.go("/login?next=/profilo"); return; }
     SEO.set({ title: "Il tuo profilo", robots: "noindex, nofollow" });
@@ -641,7 +639,7 @@ async function renderProfile() {
     root().innerHTML = `
         <section class="profile-view">
             <h2>Ciao, ${escapeHtml(u.nome)}.</h2>
-            <p class="lede">${escapeHtml(u.email)} · ${escapeHtml(u.ruolo)}</p>
+            <p class="lede">${escapeHtml(u.email)}</p>
 
             <h3 class="profile-section-title">I tuoi abbonamenti</h3>
             <div id="abb-list" class="abb-list-inline"><div class="loader">Caricamento…</div></div>
@@ -709,9 +707,7 @@ async function renderProfile() {
     }
 }
 
-// ---------------------------------------------------------------------
 // CHECKOUT (4 passi: Sommario → Pagamento → Elaborazione → Conferma)
-// ---------------------------------------------------------------------
 async function renderCheckout() {
     if (!Auth.isLoggedIn()) { Router.go("/login?next=/checkout"); return; }
     SEO.set({ title: "Checkout", robots: "noindex, nofollow" });
@@ -859,7 +855,7 @@ async function renderCheckout() {
                 <p class="checkout-confirm-sub">
                     ${isAbb
                         ? `Il tuo abbonamento <strong>${escapeHtml(payload.nome)}</strong> è attivo fino al 30 giugno 2027.`
-                        : `${count} posto${count !== 1 ? "i" : ""} riservato${count !== 1 ? "i" : ""} per <strong>${escapeHtml(payload.spettacolo)}</strong>.`
+                        : `${count} ${count !== 1 ? "posti riservati" : "posto riservato"} per <strong>${escapeHtml(payload.spettacolo)}</strong>.`
                     }
                 </p>
                 <p class="checkout-email-note">
