@@ -1,7 +1,9 @@
 // =====================================================================
 // Chiamate REST al backend
 // =====================================================================
-const API_BASE = "http://localhost:8080/api";
+const API_BASE = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:8080/api"
+    : "https://eliseo-backend.onrender.com/api";
 
 async function _fetch(path, opts = {}) {
     const r = await fetch(`${API_BASE}${path}`, {
